@@ -23,7 +23,7 @@ $(function () {
         console.log(files)
 
 
-        if(files.length<=0){
+        if (files.length <= 0) {
             layui.layer.msg('请选择上传的图片')
         }
 
@@ -35,6 +35,35 @@ $(function () {
             .cropper('destroy')      // 销毁旧的裁剪区域
             .attr('src', newImgURL)  // 重新设置图片路径
             .cropper(options)
+    })
+
+    $('#btnUpload').on('click', function () {
+        var dataURL = $image
+            .cropper('getCroppedCanvas', { // 创建一个 Canvas 画布
+                width: 100,
+                height: 100
+            })
+            .toDataURL('image/png')       // 将 Canvas 画布上的内容，转化为 base64 格式的字符串
+
+          $.ajax({
+              type:'post',
+              url:'/my/update/avatar',
+              data:{
+                avatar:dataURL
+              },
+              success:function(res){
+                  console.log(res)
+                  if(res.status==0){
+                      layui.layer.msg(res.message)
+                      
+                      window.parent.getUserInfo()
+                      parent.location.reload()
+                      
+                  }else{
+                    layui.layer.msg(res.message)
+                  }
+              }
+          })  
     })
 
 })
