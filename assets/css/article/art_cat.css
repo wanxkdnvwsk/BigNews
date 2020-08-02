@@ -13,3 +13,10 @@ body{
     align-items: center;
 }
 
+#add-form,#edit-form{
+    padding-top: 30px;
+    padding-right: 20px;
+}
+
+
+
