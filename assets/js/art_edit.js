@@ -3,6 +3,10 @@ $(function () {
     layer = layui.layer
 
 
+
+    let id = location.search.split('=')[1]
+
+
     // 初始化富文本编辑器
     initEditor()
     // 1. 初始化图片裁剪器
@@ -15,15 +19,40 @@ $(function () {
     // 3. 初始化裁剪区域
     $image.cropper(options)
 
+    getArtMsg()
+    function getArtMsg() {
+        $.ajax({
+            type: 'get',
+            url: '/my/article/' + id,
+            success: function (res) {
+                console.log(res)
+                if (res.status == 0) {
+                    //  ID
+                    $('[name=Id]').val(res.data.Id)
+                    // 标题
+                    $('[name=title]').val(res.data.title)
+                    // 类别
+                    getCat(res.data.cate_id)
+                    // 富文本
+                    setTimeout(function () {
+                        tinyMCE.activeEditor.setContent(res.data.content)
+                    }, 2000)
+                    // 封面
+                    $('#image').attr('src', 'http://ajax.frontend.itheima.net' + res.data.cover_img)
+                }
+            }
+        })
+    }
+
     //获取文章分类列表 
-    getCat()
-    function getCat() {
+    function getCat(cate_id) {
         $.ajax({
             type: 'get',
             url: '/my/article/cates',
             success: function (res) {
-                console.log(res)
+                // console.log(res)
                 if (res.status == 0) {
+                    res.cate_id = cate_id;
                     let html = template('Cat-tmp', res)
                     $('[name=cate_id]').html(html)
                     form.render()
@@ -32,7 +61,7 @@ $(function () {
         })
     }
 
-    let state = '已发布'
+   let state = '已发布'
     $('#cg').on('click', function () {
         state = '草稿'
     })
@@ -88,7 +117,7 @@ $(function () {
     function artPub(formdata){
         $.ajax({
             type:'post',
-            url:'/my/article/add',
+            url:'/my/article/edit',
             data:formdata,
             contentType: false,
             processData: false,
